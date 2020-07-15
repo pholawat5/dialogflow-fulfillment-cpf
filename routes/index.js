@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var admin = require('firebase-admin');
+var request = require('request');
 
 
 const { WebhookClient, Payload } = require('dialogflow-fulfillment');
@@ -102,12 +103,13 @@ router.post('/webhook', (req, res) => {
     async function checkOut(agent) {
       var orderId = await generateOrderId();
       var amount = 500 // Combine w/ micky
-      const orderRef = db.collection('order').doc(orderId).set({
+      const orderRef = db.collection('orders').doc(orderId + '').set({
         orderId : orderId,
         amount : amount
       })
       let token = await getAccessToken();
-      let bar = await getPaymentDeepLink(token, amount, orderId, orderId)
+      let bar = await getPaymentDeepLink(token, amount, '' + orderId, '1')
+      
       agent.add('https://liff.line.me/1654445748-DdaMEMb3?orderId=' + orderId + '&link=' + bar);
     };
 
