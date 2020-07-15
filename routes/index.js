@@ -110,7 +110,7 @@ router.post('/webhook', (req, res) => {
       let token = await getAccessToken();
       let bar = await getPaymentDeepLink(token, amount, '' + orderId, '1')
       
-      agent.add('https://liff.line.me/1654445748-DdaMEMb3?orderId=' + orderId + '&link=' + bar);
+      agent.add('https://liff.line.me/1654445748-DdaMEMb3?orderId=' + orderId + '&link=' + bar + '&status=false');
     };
 
 
