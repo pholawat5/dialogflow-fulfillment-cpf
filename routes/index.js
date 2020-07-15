@@ -229,4 +229,12 @@ router.post('/webhook', (req, res) => {
 
 });
 
+router.post('/scb/payment/confirm', async (req, res) => {
+  //console.log(req.body);
+  const userRef = db.collection('orders').doc(req.body.billPaymentRef1).update({
+    status: 'Payment Success'
+  });
+  res.send('');
+});
+
 module.exports = router;
