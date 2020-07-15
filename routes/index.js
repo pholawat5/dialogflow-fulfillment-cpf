@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var admin = require('firebase-admin');
 var request = require('request');
+const line = require('@line/bot-sdk');
 
 
 const { WebhookClient, Payload } = require('dialogflow-fulfillment');
@@ -230,10 +231,23 @@ router.post('/webhook', (req, res) => {
 });
 
 router.post('/scb/payment/confirm', async (req, res) => {
-  //console.log(req.body);
+  const client = new line.Client({
+    channelAccessToken: 'X/7imTcgi4I91zPgF/TPJmifeFTFiSa1/MyGSDBDF0xlyrC6YUmpMl2Fjwd+jiS7RMdWIzz616KKSCCayKU+A0h7wOGsfBO5aH1STbKlziyRqw7621vhNuK65GabcQjTeGuauS1Sk0Mw5dIdZkDe0gdB04t89/1O/w1cDnyilFU='
+  });
+  
+  
+  const getId = await db.collection('orders').doc(req.body.billPaymentRef1).get()
+  var destination = getId.data().userId;
   const userRef = db.collection('orders').doc(req.body.billPaymentRef1).update({
     status: 'Payment Success'
   });
+
+  const message = {
+    type: 'text',
+    text: 'Order Number #' + req.body.billPaymentRef1 + ' has been placed'
+  };
+
+  client.pushMessage(destination, message);
   res.send('');
 });
 
