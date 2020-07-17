@@ -35,65 +35,181 @@ router.post('/webhook', (req, res) => {
 
     //  Function Map To Intent
 
-    async function getCatalogue(agent) {
-        //add-on from pinn's getCategory()
-        //show All Menu
-        var arr = [];
-        const snapshot = await db.collection('product').get();
-        snapshot.forEach((doc) => {
-            nam = (doc.data()).name;
-            price = (doc.data()).price;
-            img = (doc.data()).image;
-            var jsonP = {
-                "type": "bubble",
-                "direction": "ltr",
-                "header": {
-                  "type": "box",
-                  "layout": "vertical",
-                  "contents": [
-                    {
-                      "type": "text",
-                      "text": nam,
-                      "size": "xl",
-                      "align": "center",
-                      "gravity": "top",
-                      "weight": "bold",
-                      "color": "#000000"
-                    }
-                  ]
-                },
-                "hero": {
-                  "type": "image",
-                  "url": img,
-                  "size": "full",
-                  "aspectRatio": "1.51:1"
-                },
-                "body": {
-                  "type": "box",
-                  "layout": "vertical",
-                  "contents": [
-                    {
-                      "type": "text",
-                      "text": price,
-                      "align": "center"
-                    }
-                  ]
+    async function getCatalogue(agent){
+      //agent.add('Category From Database');
+      var str = "";
+      var arr = [];
+      const snapshot = await db.collection('product').get();
+      snapshot.forEach((doc) => {
+        //agent.add((doc.data()).name);
+        //agent.add((doc.data()).price);
+        if (str != "") str.concat(",");
+        nam = (doc.data()).name;
+        price = (doc.data()).price;
+        img = (doc.data()).image;
+        stock = (doc.data()).stock;
+        if (stock == 0 ) {
+          var jsonp = {
+            "type": "bubble",
+            "direction": "ltr",
+            "header": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": nam,
+                  "wrap": true,
+                  "size": "xl",
+                  "align": "center",
+                  "gravity": "top",
+                  "weight": "bold",
+                  "color": "#000000"
                 }
-            };
-            arr.push(jsonP)
-        })
-        sumPayload = {
-            "type": "flex",
-            "altText": "Catalogue",
-            "contents": {
-                "type": "carousel",
-                "contents": arr
+              ]
+            },
+            "hero": {
+              "type": "image",
+              "url": img,
+              "size": "full",
+              "aspectRatio": "1.51:1"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": price,
+                  "size": "xl",
+                  "align": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "Out of stock",
+                  "align": "center",
+                  "color": "#E70909"
+                }
+              ]
             }
+          };
+          arr.push(jsonp);
+        } else {
+          var jsonp = {
+            "type": "bubble",
+            "direction": "ltr",
+            "header": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": nam,
+                  "wrap": true,
+                  "size": "xl",
+                  "align": "center",
+                  "gravity": "top",
+                  "weight": "bold",
+                  "color": "#000000"
+                }
+              ]
+            },
+            "hero": {
+              "type": "image",
+              "url": img,
+              "size": "full",
+              "aspectRatio": "1.51:1"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": price,
+                  "size": "xl",
+                  "align": "center"
+                },
+                {
+                  "type": "text",
+                  "text": stock.toString()+ "ีunit",
+                  "align": "center",
+                  "color": "#000000"
+                }
+              ]
+            }
+          };
+          arr.push(jsonp);
         }
-        
-        let payload = new Payload('LINE', sumPayload, { sendAsMessage : true });
+      });
+      sumstr = {
+        "type": "flex",
+        "altText": "See catalogue",
+        "contents": {
+          "type": "carousel",
+          "contents": arr
+        }
+      }
+      let payload = new Payload(`LINE`, sumstr, { sendAsMessage: true});
         agent.add(payload);
-        //show All Promotion
+  
+    }
+
+    async function askForDes(agent){
+      let namePro = agent.parameters.name;
+      const snapshot = await db.collection('product').get();
+      snapshot.forEach((doc) => {
+      nam = (doc.data()).name;
+      if( nam == namePro) {
+        size = (doc.data()).size;
+        img = (doc.data()).image;
+        descr = (doc.data()).description;
+        var jsonD = {
+          "type": "flex",
+          "altText": "See Description",
+          "contents": {
+            "type": "bubble",
+            "direction": "ltr",
+            "hero": {
+              "type": "image",
+              "url": img,
+              "size": "full",
+              //"aspectRatio": "1.51:1",
+              "aspectMode": "fit"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": nam,
+                  "size": "md",
+                  "weight" : "bold",
+                  "align": "start"
+                },
+                {
+                  "type": "separator"
+                },
+                {
+                  "type": "text",
+                  "size": "md",
+                  "text": size
+                },
+                {
+                  "type": "text",
+                  "size": "md",
+                  "wrap": true,
+                  "text": descr
+                }
+              ]
+            }
+          }
+        }
+        let payload = new Payload(`LINE`, jsonD, { sendAsMessage: true});
+        agent.add(payload);
+      } 
+      });
     }
 
     async function getSpecificCategory(agent) {
@@ -281,6 +397,7 @@ router.post('/webhook', (req, res) => {
     intentMap.set("order-showbasket", orderShowBasket);
     intentMap.set("order-clearbasket", orderClearBasket);
     intentMap.set("item-confirm-yes", itemConfirmYes);
+    intentMap.set("askForDes", askForDes);
     agent.handleRequest(intentMap);
 
 });
