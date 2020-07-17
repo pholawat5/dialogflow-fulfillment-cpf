@@ -222,10 +222,65 @@ router.post('/webhook', (req, res) => {
 
     // End Function Map To Intent
 
+    const itemConfirmYes = (agent) => {
+        const item = agent.context.get("item"),
+              food = item.parameters.food,
+              quantity = item.parameters.quantity,
+              type = item.parameters.type;
+  
+
+        var basketContext = {
+            name: "basket",
+            lifespan: 50,
+            parameters: {},
+        },
+        items = {};
+        if (agent.context.get("basket")) {
+            items = agent.context.get("basket").parameters.items;
+        }
+        items[req.body.responseId] = {
+            food: food,
+            quantity: quantity,
+            type: type,
+        };
+        basketContext.parameters.items = items;
+        console.log(JSON.stringify(basketContext));
+        agent.context.set(basketContext);
+        agent.add(`Confirming ${quantity} of ${type} ${food}. Do you want anything else?`);
+    };
+    
+    const orderShowBasket = (agent) => {
+        if (agent.context.get("basket")) {
+            const basket = agent.context.get("basket"),
+                  basketItems = basket.parameters.items,
+                  itemKeys = Object.keys(basketItems);
+        var basketOutput = "So far you've got: ";
+        for (let i = 0; i < itemKeys.length; i++) {
+            let item = basketItems[itemKeys[i]];
+            if (i > 0 && i === itemKeys.length - 1) {
+                basketOutput += ` and `;
+            } else if (i > 0) {
+                basketOutput += ` , `;
+            }
+            basketOutput += `${item.quantity} of ${item.type} ${item.food}`;
+        }
+            agent.add(basketOutput);
+        } else {
+            agent.add("You've not order yet!");
+        }
+    };
+
+    const orderClearBasket = (agent) => {
+        agent.context.delete("basket");
+        agent.add("Your basket is now empty!");
+    };
 
     let intentMap = new Map();
     intentMap.set('getCatalogue', getCatalogue);
     intentMap.set('checkOut', checkOut);
+    intentMap.set("order-showbasket", orderShowBasket);
+    intentMap.set("order-clearbasket", orderClearBasket);
+    intentMap.set("item-confirm-yes", itemConfirmYes);
     agent.handleRequest(intentMap);
 
 });
