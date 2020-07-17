@@ -132,7 +132,7 @@ router.post('/webhook', (req, res) => {
                 },
                 {
                   "type": "text",
-                  "text": stock.toString()+ "ีunit",
+                  "text": stock.toString()+ " unit",
                   "align": "center",
                   "color": "#000000"
                 }
