@@ -354,6 +354,12 @@ router.post('/webhook', (req, res) => {
         if (agent.context.get("basket")) {
             items = agent.context.get("basket").parameters.items;
         }
+        if(JSON.stringify(items) == "{}"){
+          agent.add(`น้องอิ่มเอมใส่ ${type}${food} จำนวน ${quantity} ที่ ไว้ในตะกร้าแล้วนะคะ`);
+          agent.add('หากต้องการเช็คของในตะกร้าให้พิมพ์ว่า "ตะกร้า" และหากต้องการชำระเงินให้พิมพ์ว่า "เช็คบิล"')
+        }else{
+          agent.add(`คอนเฟิร์ม ${type}${food} จำนวน ${quantity} ที่ค่ะ สนใจอะไรเพิ่มอีกไหมคะ`);
+        }
         items[req.body.responseId] = {
             food: food,
             quantity: quantity,
@@ -362,7 +368,7 @@ router.post('/webhook', (req, res) => {
         basketContext.parameters.items = items;
         console.log(JSON.stringify(basketContext));
         agent.context.set(basketContext);
-        agent.add(`Confirming ${quantity} of ${type} ${food}. Do you want anything else?`);
+        
     };
     
     const orderShowBasket = (agent) => {
@@ -370,21 +376,43 @@ router.post('/webhook', (req, res) => {
             const basket = agent.context.get("basket"),
                   basketItems = basket.parameters.items,
                   itemKeys = Object.keys(basketItems);
-        var basketOutput = "So far you've got: ";
+        var basketOutput = "ที่สั่งไปแล้วตอนนี้มีดังนี้ค่ะ ";
         for (let i = 0; i < itemKeys.length; i++) {
             let item = basketItems[itemKeys[i]];
             if (i > 0 && i === itemKeys.length - 1) {
-                basketOutput += ` and `;
+                basketOutput += ` และ `;
             } else if (i > 0) {
                 basketOutput += ` , `;
             }
-            basketOutput += `${item.quantity} of ${item.type} ${item.food}`;
+            basketOutput += `${item.type}${item.food} จำนวน ${item.quantity} ที่`;
         }
             agent.add(basketOutput);
         } else {
             agent.add("You've not order yet!");
         }
     };
+
+    const confirmOrder = (agent) => {
+      if (agent.context.get("basket")) {
+          const basket = agent.context.get("basket"),
+                basketItems = basket.parameters.items,
+                itemKeys = Object.keys(basketItems);
+      var basketOutput = "ออเดอร์มีดังนี้นะคะ ";
+      for (let i = 0; i < itemKeys.length; i++) {
+          let item = basketItems[itemKeys[i]];
+          if (i > 0 && i === itemKeys.length - 1) {
+              basketOutput += ` และ `;
+          } else if (i > 0) {
+              basketOutput += ` , `;
+          }
+          basketOutput += `${item.type}${item.food} จำนวน ${item.quantity} ที่`;
+      }
+          agent.add(basketOutput);
+      } else {
+          agent.add("You've not order yet!");
+      }
+  };
+
 
     const orderClearBasket = (agent) => {
         agent.context.delete("basket");
@@ -394,10 +422,12 @@ router.post('/webhook', (req, res) => {
     let intentMap = new Map();
     intentMap.set('getCatalogue', getCatalogue);
     intentMap.set('checkOut', checkOut);
+    intentMap.set('checkOut2', checkOut);
     intentMap.set("order-showbasket", orderShowBasket);
     intentMap.set("order-clearbasket", orderClearBasket);
     intentMap.set("item-confirm-yes", itemConfirmYes);
     intentMap.set("askForDes", askForDes);
+    intentMap.set("confirmOrder", confirmOrder)
     agent.handleRequest(intentMap);
 
 });
