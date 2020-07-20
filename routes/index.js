@@ -477,7 +477,69 @@ router.post('/webhook', (req, res) => {
           }
           basketOutput += `${item.type}${item.food} จำนวน ${item.quantity} ที่`;
       }
-          agent.add(basketOutput);
+          //agent.add(basketOutput);
+
+          var jsonP = {
+            "type": "flex",
+            "altText": "Flex Message",
+            "contents": {
+              "type": "bubble",
+              "direction": "ltr",
+              "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Confirm Order",
+                    "margin": "none",
+                    "size": "lg",
+                    "align": "center",
+                    "weight": "bold",
+                    "color": "#000000"
+                  }
+                ]
+              },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": basketOutput,
+                    "margin": "none",
+                    "align": "center",
+                    "weight": "regular"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": "เพิ่มเลย!!!",
+                      "text": "ครับ"
+                    }
+                  },
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "message",
+                      "label": "ไว้ก่อนนะ",
+                      "text": "ไม่ใช่ครับ"
+                    }
+                  }
+                ]
+              }
+            }
+          };
+          let payload = new Payload(`LINE`, jsonP, { sendAsMessage: true});
+          agent.add(payload);
+
       } else {
           agent.add("ตอนนี้ยังไม่มีของในตะกร้าเลยนะคะ!");
       }
