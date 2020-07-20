@@ -156,11 +156,12 @@ router.post('/webhook', (req, res) => {
     }
 
     async function askForDes(agent){
-      let namePro = agent.parameters.name;
+      let type = agent.parameters.type;
+      let food = agent.parameters.food
       const snapshot = await db.collection('product').get();
       snapshot.forEach((doc) => {
       nam = (doc.data()).name;
-      if( nam == namePro) {
+      if( nam == type+food) {
         size = (doc.data()).size;
         img = (doc.data()).image;
         descr = (doc.data()).description;
@@ -565,10 +566,6 @@ router.post('/scb/payment/confirm', async (req, res) => {
             {
               "type": "text",
               "text": "OrderId : " + req.body.billPaymentRef1
-            },
-            {
-              "type": "text",
-              "text": "Date : " + Date.now()
             },
             {
               "type": "text",
