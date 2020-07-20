@@ -296,8 +296,6 @@ router.post('/webhook', (req, res) => {
       }
       let payload = new Payload(`LINE`, jsonP, { sendAsMessage: true});
       agent.add(payload);
-      
-      agent.add('https://liff.line.me/1654445748-DdaMEMb3?orderId=' + orderId + '&link=' + bar + '&status=false');
     };
 
 
@@ -458,7 +456,7 @@ router.post('/webhook', (req, res) => {
         }
             agent.add(basketOutput);
         } else {
-            agent.add("You've not order yet!");
+            agent.add("ตอนนี้ยังไม่มีของในตะกร้าเลยนะคะ!");
         }
     };
 
@@ -479,14 +477,14 @@ router.post('/webhook', (req, res) => {
       }
           agent.add(basketOutput);
       } else {
-          agent.add("You've not order yet!");
+          agent.add("ตอนนี้ยังไม่มีของในตะกร้าเลยนะคะ!");
       }
   };
 
 
     const orderClearBasket = (agent) => {
         agent.context.delete("basket");
-        agent.add("Your basket is now empty!");
+        agent.add("น้องอิ่มเอาของออกจากตะกร้าให้หมดแล้วนะคะ");
     };
 
     let intentMap = new Map();
