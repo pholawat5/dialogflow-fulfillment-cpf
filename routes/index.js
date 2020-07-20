@@ -152,6 +152,7 @@ router.post('/webhook', (req, res) => {
       }
       let payload = new Payload(`LINE`, sumstr, { sendAsMessage: true});
         agent.add(payload);
+        agent.add("สนใจรับผลิดภัณฑ์ชิ้นไหนแจ้งน้องอิ่มได้เลยนะคะ");
   
     }
 
@@ -209,7 +210,6 @@ router.post('/webhook', (req, res) => {
         }
         let payload = new Payload(`LINE`, jsonD, { sendAsMessage: true});
         agent.add(payload);
-        agent.add('สนใจรับเป็นชิ้นไหนดี บอกน้องอิ่มได้เลยยย')
       } 
       });
     }
