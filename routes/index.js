@@ -226,6 +226,76 @@ router.post('/webhook', (req, res) => {
       })
       let token = await getAccessToken();
       let bar = await getPaymentDeepLink(token, amount, '' + orderId, '1')
+
+      var jsonP = {
+        "type": "flex",
+        "altText": "Payment Options",
+        "contents": {
+          "type": "bubble",
+          "direction": "ltr",
+          "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Payment Options",
+                "margin": "none",
+                "size": "lg",
+                "align": "center",
+                "weight": "bold",
+                "color": "#000000"
+              }
+            ]
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "To : SCB Sandbox",
+                "align": "start"
+              },
+              {
+                "type": "text",
+                "text": "Amount : 500"
+              }
+            ]
+          },
+          "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "button",
+                "action": {
+                  "type": "uri",
+                  "label": "Generate Payment QR",
+                  "uri": "https://liff.line.me/1654445748-X9VGWGro"
+                },
+                "style": "secondary"
+              },
+              {
+                "type": "separator",
+                "margin": "sm"
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "uri",
+                  "label": "Pay with SCB Easy",
+                  "uri": 'https://liff.line.me/1654445748-DdaMEMb3?orderId=' + orderId + '&link=' + bar + '&status=false'
+                },
+                "color": "#C7B8F2",
+                "style": "secondary"
+              }
+            ]
+          }
+        }
+      }
+      let payload = new Payload(`LINE`, jsonP, { sendAsMessage: true});
+      agent.add(payload);
       
       agent.add('https://liff.line.me/1654445748-DdaMEMb3?orderId=' + orderId + '&link=' + bar + '&status=false');
     };
@@ -434,7 +504,7 @@ router.post('/webhook', (req, res) => {
 
 router.post('/scb/payment/confirm', async (req, res) => {
   const client = new line.Client({
-    channelAccessToken: 'X/7imTcgi4I91zPgF/TPJmifeFTFiSa1/MyGSDBDF0xlyrC6YUmpMl2Fjwd+jiS7RMdWIzz616KKSCCayKU+A0h7wOGsfBO5aH1STbKlziyRqw7621vhNuK65GabcQjTeGuauS1Sk0Mw5dIdZkDe0gdB04t89/1O/w1cDnyilFU='
+    channelAccessToken: '96Jyr7vLuGTNLOJLKyAKf7eAq28KzNeNUXC92Q+eFfMiAYgciSUNua57vsUJZIj6avWO7JtgjpPmABG7FlfOoAWA2or7iPz2nTqF8i8BslMu1VI5AyfgU+uDQB9qd/jyaMss6oSoukBPLkRQJY6TIgdB04t89/1O/w1cDnyilFU='
   });
   
   
@@ -445,9 +515,72 @@ router.post('/scb/payment/confirm', async (req, res) => {
   });
 
   const message = {
-    type: 'text',
-    text: 'Order Number #' + req.body.billPaymentRef1 + ' has been placed'
-  };
+      "type": "flex",
+      "altText": "Confirm Message",
+      "contents": {
+        "type": "bubble",
+        "direction": "ltr",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "Payment",
+              "size": "xl",
+              "align": "center",
+              "weight": "bold",
+              "color": "#000000"
+            },
+            {
+              "type": "text",
+              "text": "Success",
+              "size": "md",
+              "align": "center",
+              "weight": "bold",
+              "color": "#87C553"
+            }
+          ]
+        },
+        "hero": {
+          "type": "image",
+          "url": "https://www.freeiconspng.com/uploads/success-icon-10.png",
+          "size": "sm"
+        },
+        "body": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "From : Mr. Prin Wongvit",
+              "align": "start"
+            },
+            {
+              "type": "text",
+              "text": "To : Charoen Pokphand Foods"
+            },
+            {
+              "type": "separator",
+              "margin": "lg"
+            },
+            {
+              "type": "text",
+              "text": "OrderId : " + req.body.billPaymentRef1
+            },
+            {
+              "type": "text",
+              "text": "Date : " + Date.now()
+            },
+            {
+              "type": "text",
+              "text": "Amount : "+req.body.amount,
+              "weight": "bold"
+            }
+          ]
+        }
+      }
+    };
 
   client.pushMessage(destination, message);
   res.send('');
