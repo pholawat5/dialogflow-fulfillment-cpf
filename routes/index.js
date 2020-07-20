@@ -510,7 +510,7 @@ router.post('/webhook', (req, res) => {
                     "margin": "none",
                     "align": "center",
                     "weight": "regular",
-                    "wrap": "true"
+                    "wrap": true
                   }
                 ]
               },
