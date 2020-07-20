@@ -509,7 +509,8 @@ router.post('/webhook', (req, res) => {
                     "text": basketOutput,
                     "margin": "none",
                     "align": "center",
-                    "weight": "regular"
+                    "weight": "regular",
+                    "wrap": "true"
                   }
                 ]
               },
@@ -521,7 +522,7 @@ router.post('/webhook', (req, res) => {
                     "type": "button",
                     "action": {
                       "type": "message",
-                      "label": "เพิ่มเลย!!!",
+                      "label": "จ่ายเงินเลย!!!",
                       "text": "ครับ"
                     }
                   },
